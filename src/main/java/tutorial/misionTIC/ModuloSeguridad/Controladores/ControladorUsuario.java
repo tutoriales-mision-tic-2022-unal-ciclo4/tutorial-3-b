@@ -29,18 +29,22 @@ public class ControladorUsuario {
     public Usuario show(@PathVariable String id){
         Usuario usuarioActual=this.miRepositorioUsuario
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
+                .orElse(null);
         return usuarioActual;
     }
     @PutMapping("{id}")
     public Usuario update(@PathVariable String id,@RequestBody  Usuario infoUsuario){
         Usuario usuarioActual=this.miRepositorioUsuario
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
-        usuarioActual.setSeudonimo(infoUsuario.getSeudonimo());
-        usuarioActual.setCorreo(infoUsuario.getCorreo());
-        usuarioActual.setContrasena(convertirSHA256(infoUsuario.getContrasena()));
-        return this.miRepositorioUsuario.save(usuarioActual);
+                .orElse(null);
+        if (usuarioActual!=null){
+            usuarioActual.setSeudonimo(infoUsuario.getSeudonimo());
+            usuarioActual.setCorreo(infoUsuario.getCorreo());
+            usuarioActual.setContrasena(convertirSHA256(infoUsuario.getContrasena()));
+            return this.miRepositorioUsuario.save(usuarioActual);
+        }else{
+            return null;
+        }
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -48,8 +52,10 @@ public class ControladorUsuario {
     public void delete(@PathVariable String id){
         Usuario usuarioActual=this.miRepositorioUsuario
                 .findById(id)
-                .orElseThrow(RuntimeException::new);
-        this.miRepositorioUsuario.delete(usuarioActual);
+                .orElse(null);
+        if (usuarioActual!=null){
+            this.miRepositorioUsuario.delete(usuarioActual);
+        }
     }
     public String convertirSHA256(String password) {
         MessageDigest md = null;
